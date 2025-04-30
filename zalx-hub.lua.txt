@@ -1,0 +1,222 @@
+local existingGui = game.CoreGui:FindFirstChild("MainHackGui")
+if existingGui then
+    existingGui:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "MainHackGui"
+
+
+local existingGui = game.CoreGui:FindFirstChild("MainHackGui")
+if existingGui then
+    existingGui:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "MainHackGui"
+
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Position = UDim2.new(0.3, 0, 0.3, 0)
+Frame.Size = UDim2.new(0, 300, 0, 450)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BorderSizePixel = 0
+
+
+local UICorner = Instance.new("UICorner", Frame)
+UICorner.CornerRadius = UDim.new(0, 12)
+
+local Title = Instance.new("TextLabel", Frame)
+Title.Text = "☪zalx hub☪"
+Title.Size = UDim2.new(1, 0, 0, 50)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.Arcade
+Title.TextSize = 24
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+local UserInputService = game:GetService("UserInputService")
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+local function createButton(text, yOffset, callback)
+    local btn = Instance.new("TextButton", Frame)
+    btn.Text = text
+    btn.Size = UDim2.new(0.8, 0, 0, 40)
+    btn.Position = UDim2.new(0.1, 0, 0, 60 + yOffset)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.Arcade
+    btn.TextSize = 20
+
+    local corner = Instance.new("UICorner", btn)
+    corner.CornerRadius = UDim.new(0, 8)
+
+    btn.MouseButton1Click:Connect(callback)
+end
+
+createButton(" ▶Redz Hub に移動", 0, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/newredz/BloxFruits/refs/heads/main/Source.luau"))()
+end)
+
+createButton(" ▶kncrypt hubに移動", 50, function()
+    loadstring(game.HttpGet(game,'https://raw.githubusercontent.com/Yumiara/Python/refs/heads/main/BloxFruit-XYZ.lua'))()
+end)
+
+local jumpOptionsVisible = false
+local jumpButtons = {}
+
+local jumpButtonY = 100
+local jumpButtonRef 
+
+jumpButtonRef = createButton(" ▶ジャンプ力変更", jumpButtonY, function()
+    jumpOptionsVisible = not jumpOptionsVisible
+    for _, btn in ipairs(jumpButtons) do
+        btn.Visible = jumpOptionsVisible
+    end
+end)
+
+local function createJumpOptionButton(label, xOffset, power)
+    local btn = Instance.new("TextButton", Frame)
+    btn.Text = label
+    btn.Size = UDim2.new(0, 60, 0, 30)
+    btn.Position = UDim2.new(0.1, 220 + xOffset, 0, 60 + jumpButtonY)
+    btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.Arcade
+    btn.TextSize = 16
+    btn.Visible = false
+
+    local corner = Instance.new("UICorner", btn)
+    corner.CornerRadius = UDim.new(0, 6)
+
+    btn.MouseButton1Click:Connect(function()
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        if character and character:FindFirstChild("Humanoid") then
+            character.Humanoid.JumpPower = power
+        end
+    end)
+
+    table.insert(jumpButtons, btn)
+end
+
+createJumpOptionButton("50", 0, 50)
+createJumpOptionButton("100", 65, 100)
+createJumpOptionButton("200", 130, 200)
+createJumpOptionButton("300", 195, 300)
+
+
+createButton("❌ 閉じる", 250, function()
+    ScreenGui:Destroy()
+end)
+
+local espEnabled = false
+local espConnections = {}
+
+local function createESP(player)
+    if player == game.Players.LocalPlayer then return end
+    if not player.Character then return end
+
+    local head = player.Character:FindFirstChild("Head")
+    if not head or head:FindFirstChild("ESP_GUI") then return end
+
+    local billboard = Instance.new("BillboardGui", head)
+    billboard.Name = "ESP_GUI"
+    billboard.Size = UDim2.new(0, 100, 0, 40)
+    billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+    billboard.AlwaysOnTop = true
+
+    local nameLabel = Instance.new("TextLabel", billboard)
+    nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
+    nameLabel.Position = UDim2.new(0, 0, 0, 0)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = player.Name
+    nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    nameLabel.TextStrokeTransparency = 0.5
+    nameLabel.Font = Enum.Font.SourceSansBold
+    nameLabel.TextScaled = true
+
+    local hpLabel = Instance.new("TextLabel", billboard)
+    hpLabel.Size = UDim2.new(1, 0, 0.5, 0)
+    hpLabel.Position = UDim2.new(0, 0, 0.5, 0)
+    hpLabel.BackgroundTransparency = 1
+    hpLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+    hpLabel.TextStrokeTransparency = 0.5
+    hpLabel.Font = Enum.Font.SourceSans
+    hpLabel.TextScaled = true
+
+    local con = game:GetService("RunService").RenderStepped:Connect(function()
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            hpLabel.Text = "Health: " .. math.floor(player.Character.Humanoid.Health)
+        end
+    end)
+    table.insert(espConnections, con)
+end
+
+local function enableESP()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            createESP(player)
+            player.CharacterAdded:Connect(function()
+                wait(1)
+                createESP(player)
+            end)
+        end
+    end
+end
+
+local function disableESP()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player.Character and player.Character:FindFirstChild("Head") then
+            local gui = player.Character.Head:FindFirstChild("ESP_GUI")
+            if gui then
+                gui:Destroy()
+            end
+        end
+    end
+    for _, con in ipairs(espConnections) do
+        con:Disconnect()
+    end
+    espConnections = {}
+end
+
+createButton("  ▶ESP表示切替", 150, function()
+    espEnabled = not espEnabled
+    if espEnabled then
+        enableESP()
+    else
+        disableESP()
+    end
+end)
